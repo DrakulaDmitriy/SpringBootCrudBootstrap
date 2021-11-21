@@ -1,15 +1,13 @@
 package ru.javamentor.springboot.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.javamentor.springboot.model.User;
 import ru.javamentor.springboot.service.RoleService;
 import ru.javamentor.springboot.service.UserService;
-
 
 import java.util.stream.Collectors;
 
@@ -26,50 +24,44 @@ public class AdminController {
     }
 
     @GetMapping("/admin")
-    public String showAdminPage(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        model.addAttribute("user", userService.getUserByLogin(auth.getName()));
+    public String showAdminPage(@AuthenticationPrincipal User user, Model model) {
         model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute("user", user);
+        model.addAttribute("roles", roleService.getAllRoles());
         return "admin_page";
     }
 
     @GetMapping("/add")
-    public String addNewUser(Model model) {
-        model.addAttribute("user", new User());
+    public String newUserPage(@AuthenticationPrincipal User user, Model model) {
+        model.addAttribute("user", user);
         model.addAttribute("roles", roleService.getAllRoles());
-        return "add";
+        return "new_user";
     }
 
-    @PostMapping("/add")
-    public String saveUser(@ModelAttribute("user") User user) {
-        setUserRole(user);
+    @PostMapping("/new")
+    public String createUser(@ModelAttribute("user") User user) {
+        getUserRoles(user);
         userService.saveUser(user);
         return "redirect:/admin";
     }
 
-    @GetMapping("/admin/{id}/update")
-    public String editUser(Model model, @PathVariable("id") long id) {
-        model.addAttribute("user", userService.getUserById(id));
+    @PutMapping("/{id}/update")
+    public String updateUser(@ModelAttribute("user") User user, Model model) {
         model.addAttribute("roles", roleService.getAllRoles());
-        return "/update";
-    }
-
-    @PostMapping("/admin/{id}/update")
-    public String updateUser(@ModelAttribute("user") User user) {
-        setUserRole(user);
+        getUserRoles(user);
         userService.updateUser(user);
         return "redirect:/admin";
     }
 
-    @PostMapping("/admin/{id}/delete")
+    @DeleteMapping("/{id}/delete")
     public String deleteUser(@PathVariable("id") long id) {
         userService.deleteUser(id);
         return "redirect:/admin";
     }
 
-    private void setUserRole(User user) {
+    private void getUserRoles(User user) {
         user.setRoles(user.getRoles().stream()
-                .map(r -> roleService.getRole(r.getUserRole()))
+                .map(role -> roleService.getRole(role.getUserRole()))
                 .collect(Collectors.toSet()));
     }
 }
