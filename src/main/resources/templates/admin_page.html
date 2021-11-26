@@ -13,11 +13,11 @@
 
 <nav class="navbar navbar-dark bg-dark">
     <div class="container-fluid">
-        <p class="navbar-brand text-white">
+        <a class="navbar-brand text-white">
             <b><span class="align-middle" th:text="${user.login}"></span></b>
             <span class="align-middle">with roles:</span>
             <span class="align-middle" th:text="${user.roles}"></span>
-        </p>
+        </a>
         <form th:action="@{/logout}" method="post">
             <button type="submit" class="btn btn-dark text-secondary">Logout</button>
         </form>
