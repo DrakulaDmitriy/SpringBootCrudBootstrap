@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ru.javamentor.springboot.service.UserService;
 
 @Controller
-@RequestMapping("/")
 public class UserController {
     private final UserService userService;
 

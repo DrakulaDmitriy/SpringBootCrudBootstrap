@@ -12,7 +12,6 @@ import ru.javamentor.springboot.service.UserService;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/")
 public class AdminController {
     private final UserService userService;
     private final RoleService roleService;
